@@ -1,5 +1,11 @@
+
 import { useId } from "react";
-import { arabicFor, HARAKAT, type HarakatId, type HijaiyahLetter } from "../data/game";
+import {
+  arabicFor,
+  HARAKAT,
+  type HarakatId,
+  type HijaiyahLetter,
+} from "../data/game";
 import { cn } from "../utils/cn";
 
 type GlyphProps = {
@@ -10,10 +16,16 @@ type GlyphProps = {
 };
 
 /**
- * Kartu huruf hijaiyah dalam format SVG murni (bebas royalti).
- * Huruf asli Arab dirender di dalam SVG sehingga tetap tajam di semua ukuran.
+ * Kartu huruf hijaiyah SVG.
+ * Dioptimalkan untuk keterbacaan huruf dan tanda harakat.
+ * Mendukung 29 huruf dan 6 jenis harakat.
  */
-export function HijaiyahGlyph({ letter, harakat, className, tone = "light" }: GlyphProps) {
+export function HijaiyahGlyph({
+  letter,
+  harakat,
+  className,
+  tone = "light",
+}: GlyphProps) {
   const rawId = useId().replace(/[^a-zA-Z0-9]/g, "");
   const cardId = `card-${rawId}`;
   const shineId = `shine-${rawId}`;
@@ -24,27 +36,56 @@ export function HijaiyahGlyph({ letter, harakat, className, tone = "light" }: Gl
     gold: ["#fff6cc", "#ffdf7a"],
   }[tone];
 
+  const arabicText = arabicFor(letter, harakat);
+
   return (
     <svg
       viewBox="0 0 200 200"
+      preserveAspectRatio="xMidYMid meet"
       className={cn("h-full w-full", className)}
       role="img"
-      aria-label={`Huruf hijaiyah ${letter.name} berharakat ${HARAKAT[harakat].name}`}
+      aria-label={`Huruf hijaiyah ${letter.name}, harakat ${HARAKAT[harakat].name}, dibaca ${arabicText}`}
     >
-      <title>{`Huruf ${letter.name} — ${HARAKAT[harakat].name}`}</title>
+      <title>
+        {`Huruf ${letter.name} - ${HARAKAT[harakat].name}`}
+      </title>
+
       <defs>
-        <linearGradient id={cardId} x1="0" y1="0" x2="0.4" y2="1">
+        <linearGradient
+          id={cardId}
+          x1="0"
+          y1="0"
+          x2="0.4"
+          y2="1"
+        >
           <stop offset="0%" stopColor={backgrounds[0]} />
           <stop offset="100%" stopColor={backgrounds[1]} />
         </linearGradient>
-        <linearGradient id={shineId} x1="0" y1="0" x2="1" y2="1">
+
+        <linearGradient
+          id={shineId}
+          x1="0"
+          y1="0"
+          x2="1"
+          y2="1"
+        >
           <stop offset="0%" stopColor="#ffffff" stopOpacity="0.95" />
           <stop offset="55%" stopColor="#ffffff" stopOpacity="0.18" />
           <stop offset="100%" stopColor="#ffffff" stopOpacity="0" />
         </linearGradient>
       </defs>
 
-      <rect x="4" y="4" width="192" height="192" rx="36" fill={`url(#${cardId})`} />
+      {/* Background kartu */}
+      <rect
+        x="4"
+        y="4"
+        width="192"
+        height="192"
+        rx="36"
+        fill={`url(#${cardId})`}
+      />
+
+      {/* Border kartu */}
       <rect
         x="4"
         y="4"
@@ -56,11 +97,15 @@ export function HijaiyahGlyph({ letter, harakat, className, tone = "light" }: Gl
         strokeOpacity="0.16"
         strokeWidth="3"
       />
+
+      {/* Efek cahaya */}
       <path
         d="M18 46 Q18 18 46 18 H154 Q182 18 182 46 V72 Q120 46 18 84 Z"
         fill={`url(#${shineId})`}
         opacity="0.55"
       />
+
+      {/* Dekorasi bawah */}
       <path
         d="M24 170 Q100 190 176 170"
         stroke="#9bd4ff"
@@ -69,18 +114,32 @@ export function HijaiyahGlyph({ letter, harakat, className, tone = "light" }: Gl
         fill="none"
         opacity="0.35"
       />
+
+      {/* HURUF ARAB DAN HARAKAT */}
       <text
         x="100"
-        y="116"
+        y="96"
         textAnchor="middle"
         dominantBaseline="central"
-        fontFamily="'Scheherazade New', 'Amiri', 'Noto Naskh Arabic', 'Traditional Arabic', serif"
-        fontSize={letter.id === "hamzah" ? 168 : 118}
+        fontFamily="'Scheherazade New', 'Noto Naskh Arabic', 'Amiri', 'Traditional Arabic', serif"
+        fontSize={letter.id === "hamzah" ? 112 : 108}
         fontWeight="700"
+        fontKerning="normal"
         fill="#0b2a5f"
+        style={{
+          direction: "rtl",
+          unicodeBidi: "plaintext",
+          fontFeatureSettings:
+            '"kern" 1, "mark" 1, "mkmk" 1',
+          fontVariantLigatures: "normal",
+          textRendering: "geometricPrecision",
+          overflow: "visible",
+        }}
       >
-        {arabicFor(letter, harakat)}
+        {arabicText}
       </text>
+
+      {/* Border luar */}
       <rect
         x="4"
         y="4"
@@ -104,14 +163,28 @@ type CardProps = {
   tone?: "light" | "blue" | "gold";
 };
 
-export function HijaiyahCard({ letter, harakat, className, onClick, tone }: CardProps) {
+/**
+ * Komponen kartu interaktif.
+ */
+export function HijaiyahCard({
+  letter,
+  harakat,
+  className,
+  onClick,
+  tone,
+}: CardProps) {
   if (!onClick) {
     return (
       <div className={cn("aspect-square w-full", className)}>
-        <HijaiyahGlyph letter={letter} harakat={harakat} tone={tone} />
+        <HijaiyahGlyph
+          letter={letter}
+          harakat={harakat}
+          tone={tone}
+        />
       </div>
     );
   }
+
   return (
     <button
       type="button"
@@ -122,7 +195,11 @@ export function HijaiyahCard({ letter, harakat, className, onClick, tone }: Card
         className,
       )}
     >
-      <HijaiyahGlyph letter={letter} harakat={harakat} tone={tone} />
+      <HijaiyahGlyph
+        letter={letter}
+        harakat={harakat}
+        tone={tone}
+      />
     </button>
   );
 }
