@@ -16,9 +16,9 @@ type GlyphProps = {
 };
 
 /**
- * Kartu huruf hijaiyah SVG.
- * Dioptimalkan untuk keterbacaan huruf dan tanda harakat.
- * Mendukung 29 huruf dan 6 jenis harakat.
+ * Kartu huruf hijaiyah.
+ * Ruang vertikal dioptimalkan agar harakat atas dan bawah
+ * tidak terpotong, termasuk kasrah dan kasrah tanwin.
  */
 export function HijaiyahGlyph({
   letter,
@@ -44,7 +44,7 @@ export function HijaiyahGlyph({
       preserveAspectRatio="xMidYMid meet"
       className={cn("h-full w-full", className)}
       role="img"
-      aria-label={`Huruf hijaiyah ${letter.name}, harakat ${HARAKAT[harakat].name}, dibaca ${arabicText}`}
+      aria-label={`Huruf ${letter.name}, ${HARAKAT[harakat].name}`}
     >
       <title>
         {`Huruf ${letter.name} - ${HARAKAT[harakat].name}`}
@@ -75,7 +75,7 @@ export function HijaiyahGlyph({
         </linearGradient>
       </defs>
 
-      {/* Background kartu */}
+      {/* Latar kartu */}
       <rect
         x="4"
         y="4"
@@ -85,7 +85,7 @@ export function HijaiyahGlyph({
         fill={`url(#${cardId})`}
       />
 
-      {/* Border kartu */}
+      {/* Bingkai kartu */}
       <rect
         x="4"
         y="4"
@@ -105,7 +105,7 @@ export function HijaiyahGlyph({
         opacity="0.55"
       />
 
-      {/* Dekorasi bawah */}
+      {/* Dekorasi bawah kartu */}
       <path
         d="M24 170 Q100 190 176 170"
         stroke="#9bd4ff"
@@ -115,31 +115,29 @@ export function HijaiyahGlyph({
         opacity="0.35"
       />
 
-      {/* HURUF ARAB DAN HARAKAT */}
+      {/* Huruf Arab dan harakat */}
       <text
         x="100"
-        y="96"
+        y="76"
         textAnchor="middle"
         dominantBaseline="central"
         fontFamily="'Scheherazade New', 'Noto Naskh Arabic', 'Amiri', 'Traditional Arabic', serif"
-        fontSize={letter.id === "hamzah" ? 112 : 108}
+        fontSize={letter.id === "hamzah" ? 112 : 104}
         fontWeight="700"
         fontKerning="normal"
         fill="#0b2a5f"
         style={{
           direction: "rtl",
           unicodeBidi: "plaintext",
-          fontFeatureSettings:
-            '"kern" 1, "mark" 1, "mkmk" 1',
+          fontFeatureSettings: '"kern" 1, "mark" 1, "mkmk" 1',
           fontVariantLigatures: "normal",
           textRendering: "geometricPrecision",
-          overflow: "visible",
         }}
       >
         {arabicText}
       </text>
 
-      {/* Border luar */}
+      {/* Bingkai luar */}
       <rect
         x="4"
         y="4"
@@ -164,7 +162,7 @@ type CardProps = {
 };
 
 /**
- * Komponen kartu interaktif.
+ * Kartu hijaiyah interaktif.
  */
 export function HijaiyahCard({
   letter,
